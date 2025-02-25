@@ -8,15 +8,12 @@ import cv2
  
 def main():
 
-    # Pfad des Bildes
 
     bild_pfad = r"C:\Users\Tim\Downloads\tzimas_converted.png"
 
-    # Bild laden
 
     bild = plt.imread(bild_pfad)
 
-    # Sicherstellen, dass das Bild in Graustufen vorliegt
 
     if len(bild.shape) == 3:  # Falls es ein Farbbild ist
 
@@ -33,7 +30,12 @@ def main():
     sobel_y = cv2.Sobel(gefiltert, cv2.CV_64F, 0, 1, ksize=3)  # Vertikaler Gradient
 
     # Gradientmagnituden berechnen
-
+    # helfen, Modellparameter anzupassen (durch "Anzeige", wo der steilste Abgang ist -> suchen Minimum)
+    #  -> Länge des Gradienten zeigt an, wie steil der "Abgang" ist
+    #  -> Ungewöhnlich hohe Magnituden lassen auf Vanishing Gradient (Gradienten werden sehr klein 
+    #  -> Gewichte, vorallem in tieferen Schichten werden nur langsam oder garnicht aktualisiert)
+    #  -> oder Exploding Gradient (Gewichte werden extrem groß, sodass Training unbrauchbar wird
+    #     und das Modell instabil wird)
     gradient_magnitude = cv2.magnitude(sobel_x, sobel_y)
 
 
@@ -71,7 +73,6 @@ def main():
 
     plt.show()
  
-# Main-Funktion ausführen
 
 main()
 

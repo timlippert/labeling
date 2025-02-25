@@ -4,11 +4,9 @@ import matplotlib.pyplot as plt
 
 (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data()
 
-# Daten normalisieren (Werte auf [0,1] skalieren)
 train_images = train_images / 255.0
 test_images = test_images / 255.0
 
-# Beispiel: Zeige ein paar Bilder aus dem Trainingsdatensatz
 plt.figure(figsize=(10, 5))
 for i in range(10):
     plt.subplot(2, 5, i+1)
