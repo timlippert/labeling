@@ -10,8 +10,8 @@ from keras.utils import to_categorical
 
 
 # Pfad zum Ordner mit den Trainingsbildern
-bild_ordner = r"C:\Users\Tim\Desktop\KI\labeling\Trainingsbilder"
-
+bild_ordner = r"C:\Users\Tim\Desktop\KI\labeling\Trainingsbilder\koala"
+print("Gefundene Dateien:", os.listdir(bild_ordner))
 # Listen für Bilder & Labels
 bilder = []
 labels = []
@@ -32,13 +32,17 @@ for datei in os.listdir(bild_ordner):
         bild = bild.astype("float32") / 255.0  
 
         # Tiername aus Dateiname extrahieren (z. B. "Koala1.png" → "koala")
-        tier_name = re.match(r"[A-Za-z]+", os.path.splitext(datei)[0]).group(0).lower()
+        tier_name = "gray"
 
         # Überprüfen, ob das Tier in class_mapping ist
         if tier_name in class_mapping:
             label = class_mapping[tier_name]  # Zahl zuweisen (0 für Koala, 1 für Panda)
             bilder.append(bild)  # Bild speichern
             labels.append(label)  # Label speichern
+        else:
+            label = class_mapping["panda"]
+            bilder.append(bild)
+            labels.append(label)
 
 # In NumPy-Arrays umwandeln
 bilder = np.array(bilder).reshape(-1, 64, 64, 1)  # Für CNN: (Anzahl, 64, 64, 1)
@@ -53,5 +57,13 @@ labels = to_categorical(labels, num_classes=len(class_mapping))
 X_train, X_test, y_train, y_test = train_test_split(bilder, labels, test_size=0.2, random_state=42)
 
 # Infos ausgeben
+#
 print(f"Trainingsbilder: {X_train.shape}, Testbilder: {X_test.shape}")
 print(f"Trainingslabels: {y_train.shape}, Testlabels: {y_test.shape}")
+#print(y_train[:5])  # Zeigt die ersten 5 Labels
+#print(y_test[:5])   # Zeigt die ersten 5 Testlabels
+label_namen = {0: "Koala", 1: "Panda"}
+for label in y_train[:5]:  # Gehe die ersten 5 Labels durch
+    print(label_namen[np.argmax(label)])  # Wandelt One-Hot-Encoding zurück in 0 oder 1
+print(f"Anzahl der geladenen Bilder: {len(bilder)}")
+print(f"Anzahl der geladenen Labels: {len(labels)}")
