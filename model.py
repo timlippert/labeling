@@ -4,7 +4,7 @@ import koala_training
 import numpy as np
 
 # Anzahl der Klassen im Datensatz bestimmen
-num_classes = len(np.unique(koala_training.y_train))
+num_classes = koala_training.y_train.shape[1]
 
 # keras.Sequential = Schichten, welche in der Liste stehen, werden im Modell der Reihe nach verbunden
 model = keras.Sequential([
@@ -57,5 +57,7 @@ model.fit(
     validation_data=(koala_training.X_test, koala_training.y_test)
 )
 test_loss, test_acc = model.evaluate(koala_training.X_test, koala_training.y_test, batch_size=1)
+model.save("koala_panda_model.keras")  # Speichert das Modell
+
 print(f"Test accuracy: {test_acc:.4f}")
 
