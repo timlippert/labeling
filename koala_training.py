@@ -1,10 +1,9 @@
 import os
 import cv2
 import numpy as np
-import re
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
-from keras.utils import to_categorical
+from keras.utils import to_categorical      
 
 
 
@@ -32,15 +31,16 @@ for datei in os.listdir(bild_ordner):
         bild = bild.astype("float32") / 255.0  
 
         # Tiername aus Dateiname extrahieren (z. B. "Koala1.png" → "koala")
-        tier_name = "gray"
+        tier_name1 = "koala"
+        tier_name2 = "panda"
 
         # Überprüfen, ob das Tier in class_mapping ist
-        if tier_name in class_mapping:
-            label = class_mapping[tier_name]  # Zahl zuweisen (0 für Koala, 1 für Panda)
+        if tier_name1 in class_mapping:
+            label = class_mapping[tier_name1]  # Zahl zuweisen (0 für Koala, 1 für Panda)
             bilder.append(bild)  # Bild speichern
             labels.append(label)  # Label speichern
-        else:
-            label = class_mapping["panda"]
+        if tier_name2 in class_mapping:
+            label = class_mapping[tier_name2]
             bilder.append(bild)
             labels.append(label)
 
@@ -51,10 +51,14 @@ labels = np.array(labels)
 # One-Hot-Encoding der Labels
 # One-Hot-Encoding  -> label wird zu einem Vektor, der überall 0 ist, außer an "seiner Stelle"
 # -> "grün" = [1,0,0], "rot" = [0,1,0] "gelb" -> [0,0,1] => einfache Verarbeitung für Computer
+labels = np.array(labels, dtype="int")  # Sicherstellen, dass es Integer-Werte sind
+
 labels = to_categorical(labels, num_classes=len(class_mapping))
 
 # Train-Test-Split (80% Training, 20% Test)
 X_train, X_test, y_train, y_test = train_test_split(bilder, labels, test_size=0.2, random_state=42)
+y_train = np.array(y_train)
+X_train = np.array(X_train)
 
 # Infos ausgeben
 #
@@ -63,7 +67,7 @@ print(f"Trainingslabels: {y_train.shape}, Testlabels: {y_test.shape}")
 #print(y_train[:5])  # Zeigt die ersten 5 Labels
 #print(y_test[:5])   # Zeigt die ersten 5 Testlabels
 label_namen = {0: "Koala", 1: "Panda"}
-for label in y_train[:5]:  # Gehe die ersten 5 Labels durch
-    print(label_namen[np.argmax(label)])  # Wandelt One-Hot-Encoding zurück in 0 oder 1
+for i, label in enumerate(y_train):  # Gehe die ersten 5 Labels durch
+    print(f"Bild {i + 1}: {label_namen[np.argmax(label)]}") # Wandelt One-Hot-Encoding zurück in 0 oder 1
 print(f"Anzahl der geladenen Bilder: {len(bilder)}")
 print(f"Anzahl der geladenen Labels: {len(labels)}")
