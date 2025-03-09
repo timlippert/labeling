@@ -44,11 +44,10 @@ model.summary()
 # Kompilieren des Modells mit Adam-Optimizer und der korrekten Verlustfunktion
 model.compile(
     optimizer="adam",
-    loss="categorical_crossentropy",  # Korrektur des Tippfehlers
+    loss="categorical_crossentropy",  
     metrics=["accuracy"]
 )
 
-# Training des Modells mit Trainingsdaten
 model.fit(
     koala_training.X_train, 
     koala_training.y_train, 
