@@ -2,9 +2,14 @@ import keras
 from keras import layers
 import koala_training
 import numpy as np
+from keras.callbacks import EarlyStopping
+import matplotlib.pyplot as plt
 
 # Anzahl der Klassen im Datensatz bestimmen
 num_classes = koala_training.y_train.shape[1]
+#0.4516
+#0.4785
+#0.0968
 
 # keras.Sequential = Schichten, welche in der Liste stehen, werden im Modell der Reihe nach verbunden
 model = keras.Sequential([
@@ -26,11 +31,11 @@ model = keras.Sequential([
     # layers.Dense = vollverbundene Schicht mit 64 Neuronen (64 -> Anzahl der Neuronen, activation="relu" -> ReLU-Aktivierungsfunktion
     # für nicht-lineare Transformation)
     # Zweck: Schicht kombiniert die Merkmale aus vorherigen Schichten und lernt komplexe Muster
-    layers.Dense(64, activation="relu"),
+    layers.Dense(64, activation="relu", kernel_regularizer=keras.regularizers.l2(0.001)),
     
     # layers.Dropout(0.5) -> 50% der Verbindungen werden pro Trainingsschritt zufällig deaktiviert
     # Zweck: Overfitting (Überanpassung an die Trainingsdaten) zu vermeiden
-    layers.Dropout(0.5),
+    layers.Dropout(0.3),
     
     # layers.Dense(num_classes, activation="softmax") = Ausgabeschicht mit Softmax-Aktivierung
     # Softmax gibt für jede Klasse eine Wahrscheinlichkeit aus
@@ -48,14 +53,34 @@ model.compile(
     metrics=["accuracy"]
 )
 
-model.fit(
+early_stopping = EarlyStopping(
+    monitor="val_loss",  # Überwacht die Validierungsverlustfunktion
+    patience=5,  # Stoppt nach 5 Epochen ohne Verbesserung
+    restore_best_weights=True  # Stellt das beste Modell wieder her
+
+)
+
+
+test_loss, test_acc = model.evaluate(koala_training.X_test, koala_training.y_test, batch_size=1)
+model.save("koala_panda_model.keras")  # Speichert das Modell
+
+
+
+
+history = model.fit(
     koala_training.X_train, 
     koala_training.y_train, 
-    epochs=10, 
+    epochs=25, 
     batch_size=32, 
-    validation_data=(koala_training.X_test, koala_training.y_test)
+    validation_data=(koala_training.X_test, koala_training.y_test),
+    verbose=1
 )
-test_loss, test_acc = model.evaluate(koala_training.X_test, koala_training.y_test, batch_size=1)
+
+plt.plot(history.history["loss"], label="Training Loss")
+plt.plot(history.history["val_loss"], label="Validation Loss")
+plt.legend()
+plt.show()
+
 model.save("koala_panda_model.keras")  # Speichert das Modell
 
 print(f"Test accuracy: {test_acc:.4f}")
